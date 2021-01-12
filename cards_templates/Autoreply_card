@@ -1,0 +1,178 @@
+{
+    "type": "AdaptiveCard",
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.2",
+    "body": [
+        {
+            "type": "Input.ChoiceSet",
+            "choices": [
+                {
+                    "title": "Командировка",
+                    "value": "Travel"
+                },
+                {
+                    "title": "Отпуск",
+                    "value": "Vacation"
+                },
+                {
+                    "title": "Больничный",
+                    "value": "Sickleave"
+                },
+                {
+                    "title": "Другое",
+                    "value": "Other"
+                }
+            ],
+            "placeholder": "Причина автоответа",
+            "id": "reason"
+        },
+        {
+            "type": "TextBlock",
+            "text": "Дата начала",
+            "weight": "Bolder",
+            "separator": true
+        },
+        {
+            "type": "Input.Date",
+            "id": "startdate",
+            "min": "2020-01-01",
+            "value": "2020-01-01"
+        },
+        {
+            "type": "TextBlock",
+            "text": "Дата окончания",
+            "weight": "Bolder"
+        },
+        {
+            "type": "Input.Date",
+            "id": "enddate",
+            "value": "2020-01-01",
+            "min": "2020-01-01"
+        },
+        {
+            "type": "TextBlock",
+            "text": "Телефон для связи (опционально)",
+            "weight": "Bolder"
+        },
+        {
+            "type": "Input.Text",
+            "separator": true,
+            "id": "phone",
+            "placeholder": "+7-***-***-**-**",
+            "style": "Tel"
+        },
+        {
+            "type": "TextBlock",
+            "text": "К кому можно обратиться (до 4-х человек)",
+            "weight": "Bolder"
+        },
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": "stretch",
+                    "items": [
+                        {
+                            "type": "Input.Text",
+                            "id": "name1",
+                            "placeholder": "Имя",
+                            "value": ""
+                        },
+                        {
+                            "type": "Input.Text",
+                            "id": "name2",
+                            "placeholder": "Имя",
+                            "value": ""
+                        },
+                        {
+                            "type": "Input.Text",
+                            "id": "name3",
+                            "placeholder": "Имя",
+                            "value": ""
+                        },
+                        {
+                            "type": "Input.Text",
+                            "id": "name4",
+                            "placeholder": "Имя",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "type": "Column",
+                    "width": "stretch",
+                    "items": [
+                        {
+                            "type": "Input.Text",
+                            "id": "area1",
+                            "placeholder": "Зона ответственности",
+                            "value": ""
+                        },
+                        {
+                            "type": "Input.Text",
+                            "id": "area2",
+                            "placeholder": "Зона ответственности",
+                            "value": ""
+                        },
+                        {
+                            "type": "Input.Text",
+                            "id": "area3",
+                            "placeholder": "Зона ответственности",
+                            "value": ""
+                        },
+                        {
+                            "type": "Input.Text",
+                            "id": "area4",
+                            "placeholder": "Зона ответственности",
+                            "value": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "TextBlock",
+            "text": "Язык",
+            "weight": "Bolder"
+        },
+        {
+            "type": "Input.ChoiceSet",
+            "choices": [
+                {
+                    "title": "Русский",
+                    "value": "RU"
+                },
+                {
+                    "title": "Английский",
+                    "value": "ENG"
+                },
+                {
+                    "title": "Оба",
+                    "value": "Both"
+                }
+            ],
+            "placeholder": "Выберите язык автоответа",
+            "id": "language",
+            "value": "Both"
+        },
+        {
+            "type": "ActionSet",
+            "actions": [
+                {
+                    "type": "Action.Submit",
+                    "title": "Отправить",
+                    "style": "positive",
+                    "id": "submit",
+                    "data": {
+                        "msteams": {
+                            "type": "messageBack",
+                            "displayText": "Отправлено",
+                            "text": "submitted"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

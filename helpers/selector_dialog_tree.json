@@ -1,0 +1,18 @@
+	{"ФАО":
+		 {
+			"Затраты/инвестиции/маркетинговые активности":
+				{
+					"Затраты": {
+						"Логистика, производство, тех.служба": ["Bogdan.Pilyavets@tikkurila.com", "Yuliya.Nazimova@tikkurila.com"],
+						"Прочие": ["Bogdan.Pilyavets@tikkurila.com", "Ivan.Dubar@tikkurila.com"]
+								},
+					"Маркетинг": ["Bogdan.Pilyavets@tikkurila.com", "Ivan.Dubar@tikkurila.com"],
+					"Инвестиции": ["Svetlana.Fayustova@tikkurila.com"]
+				},
+			"Коммерческие условия, платежная дисциплина":
+		 		{"Кредитные лимиты, отсрочка платежа, дебиторка": ["Ekaterina.Udalova@tikkurila.com"],
+			"Скидки, бонусы, прочие комм. условия": ["Dmitrij.Gruntov@tikkurila.com", "Mariya.Mazyarkina@tikkurila.com"]},
+			"Себестоимость, расчет цены":["Svetlana.Fayustova@tikkurila.com", "Yuliya.Nazimova@tikkurila.com"]
+		},
+	"Бухгалтерия" : {"Участок затрат":1}
+	}

@@ -1,0 +1,81 @@
+{
+    "type": "AdaptiveCard",
+    "version": "1.0",
+    "body": [
+        {
+            "type": "ColumnSet",
+            "columns": [
+                {
+                    "type": "Column",
+                    "width": "stretch",
+                    "items": [
+                        {
+                            "type": "Image",
+                            "altText": "",
+                            "url": "{worker.profileImage}",
+                            "style": "Person"
+                        }
+                    ]
+                },
+                {
+                    "type": "Column",
+                    "width": "stretch",
+                    "items": [
+                        {
+                            "type": "Container",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "{worker.name}",
+                                    "size": "Large",
+                                    "weight": "Bolder",
+                                    "horizontalAlignment": "Right",
+                                    "spacing": "Medium"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "{worker.title}",
+                                    "size": "Medium",
+                                    "horizontalAlignment": "Right",
+                                    "spacing": "None"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "{worker.email}",
+                                    "size": "Small",
+                                    "horizontalAlignment": "Right",
+                                    "spacing": "None"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "Текущий статус: {worker.status}",
+                                    "horizontalAlignment": "Right",
+                                    "spacing": "None"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Container",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "{worker.autoreply}",
+                                    "horizontalAlignment": "Right",
+                                    "color": "Attention",
+                                    "weight": "Bolder",
+                                    "size": "Medium"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "TextBlock",
+            "text": "Непосредственный руководитель: {worker.manager}",
+            "horizontalAlignment": "Center"
+        }
+    ],
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}
