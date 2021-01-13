@@ -1,6 +1,4 @@
 import yfinance as yf
-import pandas as pd
-from datetime import date
 import json
 import os
 from typing import List
@@ -10,13 +8,24 @@ from botbuilder.dialogs import (
     WaterfallDialog,
     WaterfallStepContext,
 )
-from botbuilder.dialogs.prompts import TextPrompt
 from botbuilder.core import MessageFactory, CardFactory
 from botbuilder.schema import Attachment, Activity, ActivityTypes
 
 
 class StocksDialog(ComponentDialog):
-    def __init__(self, dialog_id: str = None):
+    """A dialog sending Tikkurila's stock price to the user
+
+        Attributes:
+            CARD_PATH(list): path to an Adaptive Card json template
+            initial_dialog_id(str): UID for this dialog
+    """
+
+    def __init__(self, dialog_id: str):
+        """inits the StocksDialog instance
+
+        Args:
+            dialog_id (str): a unique name identifying specific dialog.
+        """
         super().__init__(dialog_id or StocksDialog.__name__)
 
         self.CARD_PATH = ["cards_templates", "Stock_card"]
@@ -31,6 +40,19 @@ class StocksDialog(ComponentDialog):
         self.initial_dialog_id = WaterfallDialog.__name__
 
     async def only_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """Sends an adaptive card containing the following information re Tikkurila stock:
+            - current price
+            - open price
+            - max price (inside a day)
+            - min price (inside a day)
+            - diff to the previous close price
+
+        Args:
+            step_context (WaterfallStepContext): the context for the current dialog turn
+
+        Returns:
+            DialogTurnResult: result of calling the end_dialog stack manipulation method.
+        """
         message = "В следующем сообщении будет отправлен курс акции Тиккурила. Это может занять около 5 секунд"
         await step_context.context.send_activity(
             MessageFactory.text(message)
@@ -45,14 +67,24 @@ class StocksDialog(ComponentDialog):
         return await step_context.end_dialog()
 
     def _populate_with_data(self, rel_path: list) -> Attachment:
+        """pulls the stock data from the Yahoo Finance API, populates the Adaptive card with that data
+        and creates an Attachment instance with that Card
+
+        Args:
+            rel_path (list): path to the Adaptive card json file structured as a list [folder, filename]
+
+        Returns:
+            Attachment: An Attachment instance ready to be attached to a message
+        """
         tikk = yf.Ticker("TIK1V.HE")
         res = tikk.history(period='2d')
 
         open_price = res.tail(1)['Open'][0]
         high_price = res.tail(1)['High'][0]
         low_price = res.tail(1)['Low'][0]
-        actual_price = res.tail(1)['Close'][0] if res.tail(
-            1)['Close'][0] > 0 else res.tail(1)['Open'][0]
+        # if we already have a closing price - use it, otherwise take an open
+        # price
+        actual_price = res.tail(1)['Close'][0] if res.tail(1)['Close'][0] > 0 else res.tail(1)['Open'][0]
 
         day = res.tail(1).index[0]
         day = day.to_pydatetime()
@@ -62,7 +94,8 @@ class StocksDialog(ComponentDialog):
             'Close'][1] != 0 else res.diff()['Open'][1]
         diff_open = round(diff_open, 2)
 
-        diff_percent = round((diff_open/actual_price)*100, 2)
+        # construct a string comparing the price with the previous day
+        diff_percent = round((diff_open / actual_price) * 100, 2)
         if diff_open > 0:
             symbol, color = "▲", "Good"
         elif diff_open < 0:
@@ -78,6 +111,8 @@ class StocksDialog(ComponentDialog):
         with open(full_path, "r") as card_file:
             card_json = json.load(card_file)
 
+        # atm there is no dynamic templating for Python Adaptive cards SDK,
+        # hence the brute force approach
         card_json["body"][0]["items"][1]["text"] = day
         card_json["body"][1]["items"][0]["columns"][0]["items"][0]["text"] = actual_price
         card_json["body"][1]["items"][0]["columns"][0]["items"][1]["text"] = price_string

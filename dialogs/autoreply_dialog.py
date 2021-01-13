@@ -20,7 +20,7 @@ from data_models import UserProfile
 
 
 class AutoreplyDialog(ComponentDialog):
-    """Dialog contaning the autorepky setting logic. Helps the user to set the
+    """Dialog contaning the autoreply setting logic. Helps the user to set the
     nicely formatted autoreply message without touching MS Outlook by sending an
     Adaptive card to fill out.
 
@@ -286,7 +286,7 @@ class AutoreplyDialog(ComponentDialog):
             lang=None,
             rep_names: list = None,
             rep_areas: list = None) -> Attachment:
-        """Pre-fills the Adaptive card template based on the info from the user_info attribut
+        """Pre-fills the Adaptive card template based on the info from the user_info attribute
         so the user doesn't have to make all the inputs in case of input mistakes
 
         Args:
@@ -301,7 +301,7 @@ class AutoreplyDialog(ComponentDialog):
             rep_areas (list, optional): Areas of responsibility of the employees from the rep_names argument. Defaults to None.
 
         Returns:
-            Attachment: An Attachment instance ready to be used
+            Attachment: An Attachment instance ready to be attached to a message
         """
         # this trick is needed because it's the only way to use the attributes
         # as the default values because of Python's order of evaluation

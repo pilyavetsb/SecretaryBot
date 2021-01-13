@@ -10,16 +10,29 @@ from botbuilder.dialogs.choices import Choice, FoundChoice
 from botbuilder.dialogs.choices.list_style import ListStyle
 from botbuilder.schema import Attachment, Activity, ActivityTypes
 from botbuilder.core import MessageFactory, CardFactory
-import re
 from graph_client import GraphClient
 from functools import reduce
 import os
 import operator
 import json
-from collections.abc import Iterable
+
 
 
 class PersonDialog(ComponentDialog):
+    """This is a dialog designed to guide a user through a decision tree
+    to help them choose the right person to contact with their inquiry
+
+        Attributes:
+            DONE_OPTION(str): word a user has to send to the bot to cancel the dialog at any stage
+            SITE_ID(str): id of the Sharepoint site where the json file describing the tree structure resides
+            DRIVE_ID(str): id of the drive resource where the json file describing the tree structure resides
+            selected_keys(list): list of jsoon keys selected by the user
+            client(GraphClient): MS Graph client instance associated with this dialog. Used to perform all calls to the Graph API
+            json_path(str): json file describing a tree structure being navigated by the user
+            options_list(list): a list containing all the top level choices available to the user.
+            Can be also viewed as a list of the top-level keys in the tree structure
+            initial_dialog_id(str): UID for this dialog
+    """
     def __init__(self, client: GraphClient, dialog_id: str = None):
         super().__init__(dialog_id or PersonDialog.__name__)
 
@@ -52,6 +65,14 @@ class PersonDialog(ComponentDialog):
         self.initial_dialog_id = "WFDiag"
 
     async def dep_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """[summary]
+
+        Args:
+            step_context (WaterfallStepContext): [description]
+
+        Returns:
+            DialogTurnResult: [description]
+        """
         self.selected_keys = []
 
         message = (f"К какому отделу относится ваш вопрос? Подсказка: ФАО отвечает за всевозможные согласования и расчеты, бухгалтерия - за правильный документооборот."
