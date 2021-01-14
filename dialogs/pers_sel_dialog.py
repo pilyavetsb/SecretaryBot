@@ -1,4 +1,4 @@
-from typing import List
+from typing import Iterable, List
 from botbuilder.dialogs import (
     WaterfallDialog,
     WaterfallStepContext,
@@ -17,7 +17,6 @@ import operator
 import json
 
 
-
 class PersonDialog(ComponentDialog):
     """This is a dialog designed to guide a user through a decision tree
     to help them choose the right person to contact with their inquiry
@@ -33,7 +32,14 @@ class PersonDialog(ComponentDialog):
             Can be also viewed as a list of the top-level keys in the tree structure
             initial_dialog_id(str): UID for this dialog
     """
+
     def __init__(self, client: GraphClient, dialog_id: str = None):
+        """inits a PersonDialog instance
+
+        Args:
+            client (GraphClient): MS Graph client instance associated with this dialog. Used to perform all calls to the Graph API
+            dialog_id (str): a unique name identifying specific dialog.
+        """
         super().__init__(dialog_id or PersonDialog.__name__)
 
         self.DONE_OPTION = "завершить"
@@ -65,18 +71,22 @@ class PersonDialog(ComponentDialog):
         self.initial_dialog_id = "WFDiag"
 
     async def dep_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-        """[summary]
+        """Prompts the user to choose the department to which their question is related and stores the choice.
+        Validates the input and re-promts the user if the validation is not passed.
 
         Args:
-            step_context (WaterfallStepContext): [description]
+            step_context (WaterfallStepContext): the context for the current dialog turn
 
         Returns:
-            DialogTurnResult: [description]
+            DialogTurnResult: result of calling the prompt stack manipulation method.
+            Contains the users' response.
         """
         self.selected_keys = []
 
-        message = (f"К какому отделу относится ваш вопрос? Подсказка: ФАО отвечает за всевозможные согласования и расчеты, бухгалтерия - за правильный документооборот."
-                   f"Чтобы завершить работу с ботом, выберите '{self.DONE_OPTION}'.")
+        message = (
+            f"К какому отделу относится ваш вопрос? Подсказка: ФАО отвечает за всевозможные "
+            f"согласования и расчеты, бухгалтерия - за правильный документооборот."
+            f"Чтобы завершить работу с ботом, выберите '{self.DONE_OPTION}'.")
 
         options = self.options_list.copy()
         path_link = await self.client.download_file(
@@ -97,6 +107,16 @@ class PersonDialog(ComponentDialog):
         return await step_context.prompt('level1', options=prompt_options)
 
     async def type_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """Prompts the user to choose the functional area to which their question is related and stores the choice.
+        Validates the input and re-promts the user if the validation is not passed.
+
+        Args:
+            step_context (WaterfallStepContext): the context for the current dialog turn
+
+        Returns:
+            DialogTurnResult: result of calling the prompt stack manipulation method.
+            Contains the users' response.
+        """
         selected = step_context.result.value
 
         if selected == self.DONE_OPTION:
@@ -104,7 +124,8 @@ class PersonDialog(ComponentDialog):
 
         self.selected_keys.append(selected)
 
-        message = f"К какой части функционала {selected} относится ваш вопрос? Выберите вариант из списка. Чтобы завершить работу с ботом, выберите '{self.DONE_OPTION}'."
+        message = f"К какой части функционала {selected} относится ваш вопрос? Выберите вариант из списка. "
+        f"Чтобы завершить работу с ботом, выберите '{self.DONE_OPTION}'."
         options = list(self._dict_traverser(
             self.selected_keys, self.json_path).keys())
         options.append(self.DONE_OPTION)
@@ -119,6 +140,16 @@ class PersonDialog(ComponentDialog):
         return await step_context.prompt('level2', options=prompt_options)
 
     async def subtype_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """Prompts the user to choose further details of a functional area to which their question is related and stores the choice.
+        Validates the input and re-promts the user if the validation is not passed.
+
+        Args:
+            step_context (WaterfallStepContext): the context for the current dialog turn
+
+        Returns:
+            DialogTurnResult: result of calling the prompt stack manipulation method.
+            Contains the users' response.
+        """
         selected = step_context.result.value
 
         if selected == self.DONE_OPTION:
@@ -126,11 +157,14 @@ class PersonDialog(ComponentDialog):
 
         self.selected_keys.append(selected)
 
+        # if we already reached the end of a branch, silently go to the next stage,
+        # no additional prompt is needed
         json_node = self._dict_traverser(self.selected_keys, self.json_path)
         if "@tikkurila.com" in "\t".join(json_node):
             return await step_context.next(json_node)
 
-        message = f"Ваш выбор: {selected}. Пожалуйста конкретизируйте его, выбрав вариант из списка, или выберите '{self.DONE_OPTION}', чтобы закончить работу с ботом."
+        message = f"Ваш выбор: {selected}. Пожалуйста конкретизируйте его, выбрав вариант из списка, "
+        f"или выберите '{self.DONE_OPTION}', чтобы закончить работу с ботом."
         options = list(json_node.keys())
         options.append(self.DONE_OPTION)
 
@@ -144,7 +178,17 @@ class PersonDialog(ComponentDialog):
         return await step_context.prompt('level3', options=prompt_options)
 
     async def lvl4_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-        selected = step_context.result  # тут чек
+        """Prompts the user to choose further details of a functional area to which their question is related and stores the choice.
+        Validates the input and re-promts the user if the validation is not passed.
+
+        Args:
+            step_context (WaterfallStepContext): the context for the current dialog turn
+
+        Returns:
+            DialogTurnResult: result of calling the prompt stack manipulation method.
+            Contains the users' response.
+        """
+        selected = step_context.result
 
         if selected == self.DONE_OPTION:
             return await step_context.end_dialog()
@@ -156,10 +200,13 @@ class PersonDialog(ComponentDialog):
 
         json_node = self._dict_traverser(self.selected_keys, self.json_path)
 
+        # if we already reached the end of a branch, silently go to the next stage,
+        # no additional prompt is needed
         if "@tikkurila.com" in "\t".join(json_node):
             return await step_context.next(json_node)
 
-        message = f"{selected.value} - в этом не так-то просто разобраться! Осталось сделать последнее уточнение и выбрать вариант из списка:"
+        message = f"{selected.value} - в этом не так-то просто разобраться! "
+        f"Осталось сделать последнее уточнение и выбрать вариант из списка:"
         options = list(json_node.keys())
 
         prompt_options = PromptOptions(
@@ -172,8 +219,19 @@ class PersonDialog(ComponentDialog):
         return await step_context.prompt('level4', options=prompt_options)
 
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """Sends one or more Adaptive cards containing the information on the best employee to contact
+        given the previous choices of the user
+
+        Args:
+            step_context (WaterfallStepContext): the context for the current dialog turn
+
+        Returns:
+            DialogTurnResult: result of calling the end_dialog stack manipulation method.
+        """
         selected = step_context.result
 
+        # if the email was already identified on the previous steps, use it
+        # if not - identify it first
         if not isinstance(selected, FoundChoice):
             emails = selected
         else:
@@ -193,22 +251,41 @@ class PersonDialog(ComponentDialog):
 
         return await step_context.end_dialog()
 
-    def _dict_traverser(self, lookup, nested):
+    def _dict_traverser(self, lookup: Iterable, nested: dict) -> str:
+        # traverses the tree based on the list of keys
         return reduce(operator.getitem, lookup, nested)
 
     def _to_choices(self, choices: list) -> List[Choice]:
+        """Converts the list of strings to the list of instances of Choice objects
+            Args:
+                choices (List[str]): list of strings to be converted
+            Returns:
+                List[Choice]: list of Choice objects which can now be passed to a prompt method.
+        """
         choice_list: List[Choice] = []
         for choice in choices:
             choice_list.append(Choice(value=choice))
         return choice_list
 
-    async def _populate_adaptive(self, email) -> Attachment:
+    async def _populate_adaptive(self, email: str) -> Attachment:
+        """Fetches the data from the Graph API and populates the Adaptive card
+        with this information
+
+        Args:
+            email (str): an email of the employee to be used in Graph calls
+
+        Returns:
+            Attachment: An Attachment instance ready to be attached to a message
+        """
         manager = await self.client.get_manager(email)
         status = await self.client.get_presence(email)
         autoreply = await self.client.get_autorepl_date(email)
         picture = await self.client.get_picture_for_adap(email)
         name, title, mail = await self.client.get_user(email)
 
+        # constructing the full path and accesing the name.
+        # This whole "folder-filename" as a list thing is needed to make a
+        # filepath OS-agnostic
         rel_path = ["cards_templates", "Person_card"]
         this_file = os.getcwd()
         full_path = os.path.join(this_file, *rel_path)

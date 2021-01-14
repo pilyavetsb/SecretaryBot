@@ -84,7 +84,8 @@ class StocksDialog(ComponentDialog):
         low_price = res.tail(1)['Low'][0]
         # if we already have a closing price - use it, otherwise take an open
         # price
-        actual_price = res.tail(1)['Close'][0] if res.tail(1)['Close'][0] > 0 else res.tail(1)['Open'][0]
+        actual_price = res.tail(1)['Close'][0] if res.tail(
+            1)['Close'][0] > 0 else res.tail(1)['Open'][0]
 
         day = res.tail(1).index[0]
         day = day.to_pydatetime()
