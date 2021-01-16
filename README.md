@@ -1,6 +1,6 @@
 # Finance and Analytics Department Helper Bot
 This is a Microsoft Teams bot aiming to automate some of my tedious tasks while improving internal customers' experience at the same time.
-Also a nice exercise in async python and Microsoft Graph API.
+Also a nice exercise in async python and Microsoft Graph API. My Magnum Opus atm😁
 
 ## What it does
 - constructs an autoreply message, sets it active and marks the calendar as "out of office" according to user inputs. Autoreply message can be both in English and Russian (at the same time!)
